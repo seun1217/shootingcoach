@@ -41,11 +41,13 @@ final class SessionViewModel: ObservableObject {
         analyzer = ShotAnalyzer(rim: rim)
         analyzer.delegate = self
 
-        camera.onFrame = { [weak self] sampleBuffer, angle in
-            // Runs on the camera's video queue.
-            guard let self else { return }
-            self.recorder.append(sampleBuffer)
-            self.analyzer.process(sampleBuffer, rotationAngle: angle)
+        // Runs on the camera's video queue: capture the thread-safe workers
+        // directly instead of touching main-actor state through self.
+        let recorder = self.recorder
+        let analyzer = self.analyzer
+        camera.onFrame = { sampleBuffer, angle in
+            recorder.append(sampleBuffer)
+            analyzer.process(sampleBuffer, rotationAngle: angle)
         }
         camera.onError = { [weak self] message in
             self?.statusMessage = message

@@ -24,8 +24,9 @@ final class CameraService: NSObject {
     /// stay in the sensor's native orientation and Vision compensates.
     let rotationAngle = Locked<CGFloat>(0)
 
-    /// Called on the video queue for every captured frame.
-    var onFrame: ((CMSampleBuffer, CGFloat) -> Void)?
+    /// Called on the video queue for every captured frame. @Sendable keeps the
+    /// closure nonisolated even when it is created inside a @MainActor type.
+    var onFrame: (@Sendable (CMSampleBuffer, CGFloat) -> Void)?
     /// Called on the main queue when configuration fails.
     var onError: ((String) -> Void)?
 

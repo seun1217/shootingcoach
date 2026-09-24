@@ -4,7 +4,7 @@ import Photos
 
 /// Optional full-session recording. Frames are appended on the camera queue;
 /// start/stop come from the main thread, so state is lock-protected.
-final class SessionRecorder {
+final class SessionRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var writer: AVAssetWriter?
     private var input: AVAssetWriterInput?

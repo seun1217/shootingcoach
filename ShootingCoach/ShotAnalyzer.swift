@@ -25,7 +25,9 @@ protocol ShotAnalyzerDelegate: AnyObject {
 /// Consumes camera frames and turns them into shot events:
 /// ball trajectories via VNDetectTrajectoriesRequest, shooter form via
 /// VNDetectHumanBodyPoseRequest, make/miss via the user-placed rim box.
-final class ShotAnalyzer {
+/// Thread safety: mutable state is confined to `queue`; cross-thread inputs
+/// go through `Locked`.
+final class ShotAnalyzer: @unchecked Sendable {
     weak var delegate: ShotAnalyzerDelegate?
 
     let config: AnalyzerConfig
