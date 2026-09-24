@@ -51,6 +51,36 @@ Apple Watch: 햅틱(성공=success, 실패=failure) + 결과 화면
 3. `ShootingCoach` 스킴 → 본인 iPhone 선택 → 실행. 워치 앱은 의존성으로 함께 빌드·설치됩니다.
    - 워치에 자동 설치되지 않으면 iPhone의 Watch 앱 → 일반 → 앱 설치에서 수동 설치.
 
+## TestFlight 배포 (Mac 없이 설치)
+
+GitHub Actions의 macOS 서버가 빌드·서명하고 TestFlight에 올립니다(`.github/workflows/ios.yml`).
+push할 때마다 컴파일 확인만 하고, 업로드는 **Actions → iOS Build & TestFlight → Run workflow**로 수동 실행할 때만 합니다.
+
+처음 한 번만 준비하면 됩니다.
+
+1. **Apple Developer Program** 가입 (연 $99). TestFlight를 쓰려면 필요합니다.
+2. **팀 ID 확인**: developer.apple.com → Account → Membership details → Team ID (10자리).
+3. **App Store Connect API 키 발급**: App Store Connect → 사용자 및 액세스 → 통합 → App Store Connect API → 팀 키 생성.
+   - 액세스 권한은 **Admin**으로 설정합니다(인증서·프로비저닝 자동 생성에 필요).
+   - Key ID, Issuer ID를 메모하고 `.p8` 파일을 내려받습니다. 파일은 한 번만 받을 수 있습니다.
+4. **GitHub Secrets 등록**: 저장소 Settings → Secrets and variables → Actions → New repository secret
+
+   | 이름 | 값 |
+   |---|---|
+   | `APPLE_TEAM_ID` | 2번의 팀 ID |
+   | `ASC_KEY_ID` | 3번의 Key ID |
+   | `ASC_ISSUER_ID` | 3번의 Issuer ID |
+   | `ASC_KEY_P8` | `.p8` 파일 내용 전체(`-----BEGIN PRIVATE KEY-----`부터 끝까지) |
+
+5. **앱 레코드 생성**: App Store Connect → 앱 → + → 신규 앱
+   - 플랫폼 iOS, 이름 자유(예: 슈팅코치), 번들 ID `com.seun1217.shootingcoach`
+   - 번들 ID가 목록에 없으면 워크플로를 한 번 실행해 자동 등록되게 한 뒤 다시 만듭니다.
+     또는 developer.apple.com → Identifiers에서 직접 등록합니다.
+6. **Run workflow** 실행 → 5~15분 뒤 App Store Connect → TestFlight에 빌드가 나타납니다.
+   **내부 테스트** 그룹을 만들고 본인을 추가합니다.
+7. iPhone에서 **TestFlight** 앱을 설치하고 슈팅코치를 설치합니다.
+   워치 앱은 iPhone의 Watch 앱 → 사용 가능한 앱에서 설치하거나, 자동 설치가 켜져 있으면 함께 설치됩니다.
+
 ## 사용법
 
 1. **거치**: 삼각대 등으로 iPhone을 가로로 고정하고, 코트 **측면**에서 슈터와 골대가 한 화면에 들어오게 합니다. (분석 중 카메라가 흔들리면 궤적 인식이 어려워집니다)
